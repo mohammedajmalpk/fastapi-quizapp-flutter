@@ -1,1 +1,3 @@
 /quizapp_env
+.DS_Store
+*.pyc
