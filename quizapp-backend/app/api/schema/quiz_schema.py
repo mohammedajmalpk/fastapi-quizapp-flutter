@@ -34,9 +34,6 @@ class questionUpdateRequest(questionBaseRequest):
 
 class answerUpdateRequest(answerBaseRequest):
     id: int
-    questionId: int
-    answer: str
-    is_correct: bool
 
 
 class UserBaseRequest(BaseModel):
