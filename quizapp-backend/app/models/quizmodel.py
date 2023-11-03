@@ -12,6 +12,8 @@ class Questions(Base):
     question = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), default=datetime.now())
 
+    answer = relationship('Answers', back_populates='question')
+
     def __str__(self):
         return self.id
 
@@ -24,7 +26,7 @@ class Answers(Base):
     is_correct = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), default=datetime.now())
 
-    question = relationship("Questions")
+    question = relationship("Questions", back_populates='answer')
 
     def __str__(self):
         return self.id

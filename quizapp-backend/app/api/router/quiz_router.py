@@ -82,37 +82,34 @@ async def create_answer(request: answerUpdateRequest, db: Session = Depends(get_
 @router.get("/question-answer/all/{questionid}")
 async def fetch_all_questions_answers(questionid: int,db:Session=Depends(get_db)):
     try:
-        is_existed_question_answers = db.query(Answers).filter(
-            Answers.questionId == questionid
-        ).order_by('id').all()
+        is_existed_question_answers = db.query(Questions).filter(
+            Questions.id == questionid
+        ).first()
         if is_existed_question_answers is None:
             raise HTTPException(detail="No Questions Found", status_code=status.HTTP_404_NOT_FOUND)
         context = {
-                "question":is_existed_question_answers[0].question.question,
-                "answers":[
-                    {
-                    "answer": item.answer,
-                    "is_correct": item.is_correct
-                } for item in is_existed_question_answers]
-            }
+            "question":is_existed_question_answers.question,
+            "answers":[{"id":i.id, "answer": i.answer} for i in is_existed_question_answers.answer]
+        }
         return {"detail":context, "status":status.HTTP_200_OK}
     finally:
         db.close()
 
-@router.get("/question-correct-answer/all/")
+@router.get("/question-correct-answer/all")
 async def fetch_all_questions_correct_answers(db:Session=Depends(get_db)):
     try:
-        is_existed_question_answers = db.query(Answers).filter(
-            Answers.is_correct == True
-        ).order_by('id').all()
+        is_existed_question_answers = db.query(Questions).order_by('id').all()
         if is_existed_question_answers is None:
             raise HTTPException(detail="No Questions Found", status_code=status.HTTP_404_NOT_FOUND)
         context = [
             {
-                "question":item.question.question,
-                "correct answer": item.answer,
-                "questionId": item.question.id,
-                "answerid": item.id
+                "question_answer": [
+                    {
+                        "questionId": item.id,
+                        "question": item.question,
+                        "answer": i.answer,
+                        "answerId":i.id
+                    } for i in item.answer if i.is_correct == True]
             } for item in is_existed_question_answers
         ]
         return {"detail":context, "status":status.HTTP_200_OK}
